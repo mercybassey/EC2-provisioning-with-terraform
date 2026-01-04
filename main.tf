@@ -13,21 +13,6 @@ data "aws_ami" "ubuntu" {
     }
 }
 
-data "aws_vpc" "default" {
-    default = true
-}
-
-data "aws_subnets" "default_vpc_subnets" {
-    filter {
-        name = "vpc-id"
-        values = [data.aws_vpc.default.id]
-    }
-} 
-
-data "aws_subnet" "default_vpc_subnet_details" {
-  for_each = toset(data.aws_subnets.default_vpc_subnets.ids)
-  id       = each.value
-}
 
 
 data "aws_iam_policy_document" "ec2_policy_document" {
@@ -62,15 +47,27 @@ locals {
         Name = var.iam_role
     })
 
-    sorted_subnet_ids = sort([
-        for s in data.aws_subnet.default_vpc_subnet_details : s.id
-    ])
+    vpc_tags = merge(local.common_tags, {
+        Name = "mysql-production-vpc"
+    })
+
+    igw_tags = merge(local.common_tags, {
+        Name = var.internet_gateway
+    })
+}
+
+# Create a Custom VPC
+resource "aws_vpc" "ec2_vpc" {
+  cidr_block = var.vpc_cidr
+  tags = local.vpc_tags
+  enable_dns_support = true
+  enable_dns_hostnames = true
 }
 
 # Create a Security Group
 resource "aws_security_group" "allow_tls" {
   name = var.security_group
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.ec2_vpc.id
   tags = local.security_group_tags
 }
 
@@ -89,21 +86,20 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv6" {
 
 # Create EC2 Instance
 resource "aws_instance" "mysql_ec2_instance" {
-  ami = data.aws_ami.ubuntu.id
-  instance_type = var.instance_type
-  subnet_id = local.sorted_subnet_ids
-  security_group_ids = [aws_security_group.allow_tls.id]
-  iam_instance_profile = aws_iam_instance_profile.ec2_ssm_instance_profile.name
-  
-  depends_on = [ 
-    aws_iam_role_policy_attachment.ssm,
-    aws_security_group.allow_tls
-   ]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type           = var.instance_type
+  subnet_id               = local.sorted_subnet_ids[0]
+  vpc_security_group_ids = [aws_security_group.allow_tls.id]
+  iam_instance_profile    = aws_iam_instance_profile.ec2_ssm_instance_profile.name
+
+  depends_on = [
+    aws_iam_role_policy_attachment.ssm
+  ]
 
   root_block_device {
-    volume_size = 20 
+    volume_size = 20
     volume_type = "gp3"
-    encrypted = true
+    encrypted   = true
   }
 
   tags = local.instance_tags
@@ -133,3 +129,9 @@ resource "aws_iam_instance_profile" "ec2_ssm_instance_profile" {
     ]
 }
 
+# Create Internet Gateway
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.ec2_vpc.id
+
+  tags = local.igw_tags
+}
