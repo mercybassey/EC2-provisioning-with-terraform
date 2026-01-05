@@ -74,6 +74,11 @@ locals {
     Name    = "ssm-endpoint"
     Service = "Systems Manager"
   })
+
+  ssm_messages_endpoint_tags = merge(local.common_tags, {
+    Name    = "ssm-messages-endpoint"
+    Service = "Systems Manager Messages"
+  })
 }
 
 # Create a Custom VPC
@@ -215,3 +220,14 @@ resource "aws_vpc_endpoint" "ssm" {
   tags = local.ssm_endpoint_tags
 }
 
+# Create SSM Messages VPC Endpoint
+resource "aws_vpc_endpoint" "ssmmessages" {
+  vpc_id              = aws_vpc.ec2_vpc.id
+  service_name        = "com.amazonaws.${var.region}.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_subnet.id]
+  security_group_ids  = [aws_security_group.vpc_endpoints_sg.id]
+  private_dns_enabled = true
+
+  tags = local.ssm_messages_endpoint_tags
+}
