@@ -79,6 +79,11 @@ locals {
     Name    = "ssm-messages-endpoint"
     Service = "Systems Manager Messages"
   })
+
+  ec2_messages_endpoint_tags = merge(local.common_tags, {
+    Name    = "ec2-messages-endpoint"
+    Service = "EC2 Messages"
+  })
 }
 
 # Create a Custom VPC
@@ -118,7 +123,10 @@ resource "aws_instance" "mysql_ec2_instance" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_ssm_instance_profile.name
 
   depends_on = [
-    aws_iam_role_policy_attachment.ssm
+    aws_iam_role_policy_attachment.ssm,
+    aws_vpc_endpoint.ssm,
+    aws_vpc_endpoint.ssmmessages,
+    aws_vpc_endpoint.ec2messages
   ]
 
   root_block_device {
@@ -230,4 +238,16 @@ resource "aws_vpc_endpoint" "ssmmessages" {
   private_dns_enabled = true
 
   tags = local.ssm_messages_endpoint_tags
+}
+
+# Create EC2 Messages VPC Endpoint
+resource "aws_vpc_endpoint" "ec2messages" {
+  vpc_id              = aws_vpc.ec2_vpc.id
+  service_name        = "com.amazonaws.${var.region}.ec2messages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_subnet.id]
+  security_group_ids  = [aws_security_group.vpc_endpoints_sg.id]
+  private_dns_enabled = true
+
+  tags = local.ec2_messages_endpoint_tags
 }
