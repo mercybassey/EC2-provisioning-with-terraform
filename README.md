@@ -27,7 +27,7 @@ This project demonstrates an infrastructure-as-code automation with Terraform fo
 **1. Dynamic AMI Selection**
 
 * AWS regularly update the AMI IDs of operating systems when security patches or improvements become available. In this case, dynamically fetch the latest official Ubuntu 24.04 LTS AMI from Canonical instead of hardcoding it.
-* Configure dynamic AMI selection using Terraform's data source ...  to  fetch the the most recent, secure image is always used without any manual update or change to the Terraform code.
+* Configure dynamic AMI selection using Terraform's data source decleration to  fetch the the most recent and secure image without any manual update or change to the Terraform code.
 * **Filter criteria:** Architecture (x86_64), root device type (EBS), virtualization type (HVM)
 
 **2. IAM Configuration for Systems Manager**
