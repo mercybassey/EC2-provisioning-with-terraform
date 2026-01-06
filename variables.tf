@@ -6,8 +6,8 @@ variable "region" {
 
 variable "instance_name" {
   type        = string
-  description = "EC2 MySQL Instance"
-  default     = "My MySQL EC2 Instance"
+  description = "EC2 Instance"
+  default     = "My EC2 Instance"
 }
 
 variable "instance_type" {
@@ -22,10 +22,16 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "mysql_private_subnet" {
+variable "private_subnet_cidr" {
   type        = string
   description = "Private subnet IP range"
   default     = "10.0.10.0/24"
+}
+
+variable "public_subnet_cidr" {
+  type        = string
+  description = "Public subnet IP range for NAT Gateway"
+  default     = "10.0.1.0/24"
 }
 
 variable "availability_zone" {

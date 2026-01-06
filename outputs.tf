@@ -1,19 +1,19 @@
 # Output EC2 Instance ID
 output "instance_id" {
   description = "EC2 instance ID"
-  value       = aws_instance.mysql_ec2_instance.id
+  value       = aws_instance.ec2_instance.id
 }
 
 # Output Private IP of EC2
 output "private_ip" {
   description = "Private IP address of the EC2 instance"
-  value       = aws_instance.mysql_ec2_instance.private_ip
+  value       = aws_instance.ec2_instance.private_ip
 }
 
 # Output SSM Session Connection Command
 output "ssm_session_command" {
   description = "Command to connect to the instance using AWS SSM Session Manager"
-  value = "aws ssm start-session --target ${aws_instance.mysql_ec2_instance.id}"
+  value = "aws ssm start-session --target ${aws_instance.ec2_instance.id}"
 }
 
 # Output Internet Access State
