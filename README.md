@@ -1,6 +1,7 @@
 ## Secure MySQL Deployment on AWS EC2 using Terraform, AWS SSM and Conditionl NAT Gateway
 
-This project demonstrates an infrastructure-as-code automation with Terraform for a production grade MySQL database infrastructure on AWS, featuring AWS EC2, conditional NAT Gateway for cost-optimized outbound internet access, Zero-trust access via AWS SSM session manager, and VPC endpoints for private AWS service communication. 
+This project demonstrates an infrastructure-as-code automation using Terraform to set up a production-grade MySQL database infrastructure on AWS. It features AWS EC2 instances, a conditional NAT Gateway for cost-optimized outbound internet access, zero-trust access through the AWS SSM Session Manager, and VPC endpoints for private communication with AWS services.
+
 
 ## The Problem
 
