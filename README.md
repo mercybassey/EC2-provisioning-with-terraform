@@ -2,7 +2,7 @@
 
 This project demonstrates an infrastructure-as-code automation using Terraform to set up a production-grade MySQL database infrastructure on AWS. It features AWS EC2 instances, a Conditional NAT Gateway for cost-optimized outbound internet access, zero-trust access through the AWS SSM Session Manager, and VPC endpoints for private communication with AWS services.
 
-![Architectural Diagram](https://imgur.com/a/mBrDlL3#apem8o8.png)   
+![Architectural Diagram](https://i.imgur.com/apem8o8.png)   
 
 
 ## The Problem
